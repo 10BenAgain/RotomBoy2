@@ -19,7 +19,11 @@ class Roles(commands.Cog):
     @commands.group()
     async def role(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send("You are missing a required argument")
+            await ctx.send("You are missing a subcommand argument."
+                           "```Example:\n"
+                           "\t[p] role add <role> <user>\n"
+                           "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name)
+                           )
 
     @role.command(name="add")
     async def add_role(self, ctx, role: discord.Role, user: discord.Member = None):
