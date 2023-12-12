@@ -32,12 +32,17 @@ class Owner(commands.Cog):
 
         if cog.lower() == "owner":
             return await ctx.send("Unable to reload owner cog.")
-
-        if cog == "errors":
-            await self.bot.reload_extension("utils.error_handler")
-        else:
-            await self.bot.reload_extension(self.cogs + cog.lower())
-            await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        try:
+            if cog == "errors":
+                await self.bot.reload_extension("utils.error_handler")
+                await ctx.send(f"Reloaded extension `{cog.lower()}`")
+            else:
+                await self.bot.reload_extension(self.cogs + cog.lower())
+                await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        except commands.ExtensionAlreadyLoaded:
+            await ctx.send("The specified extension is already loaded")
+        except commands.ExtensionNotLoaded:
+            await ctx.send("The specified extension has not be previously loaded")
 
     @commands.has_permissions(administrator=True)
     @commands.command()
