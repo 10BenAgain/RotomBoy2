@@ -21,33 +21,40 @@ class Owner(commands.Cog):
     async def reload(self, ctx, cog):
         if cog.lower() == "owner":
             return await ctx.send("Unable to reload owner cog.")
-
-        if cog == "errors":
-            await self.bot.reload_extension("utils.error_handler")
-        else:
-            await self.bot.reload_extension(self.cogs + cog.lower())
-            await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        try:
+            if cog == "errors":
+                await self.bot.reload_extension("utils.error_handler")
+            else:
+                await self.bot.reload_extension(self.cogs + cog.lower())
+                await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        except commands.ExtensionNotLoaded:
+            await ctx.send("The specified extension is has not been loaded")
 
     @commands.has_permissions(administrator=True)
     @commands.command()
     async def load(self, ctx, cog):
-        if cog == "errors":
-            await self.bot.reload_extension("utils.error_handler")
-        else:
-            await self.bot.reload_extension(self.cogs + cog.lower())
-            await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        try:
+            if cog == "errors":
+                await self.bot.load_extension("utils.error_handler")
+            else:
+                await self.bot.load_extension(self.cogs + cog.lower())
+                await ctx.send(f"Loaded extension `{cog.lower()}`")
+        except commands.ExtensionAlreadyLoaded:
+            await ctx.send("The specified extension is already loaded")
 
     @commands.has_permissions(administrator=True)
     @commands.command()
     async def unload(self, ctx, cog):
         if cog.lower() == "owner":
             return await ctx.send("Unable to unload owner cog.")
-
-        if cog == "errors":
-            await self.bot.reload_extension("utils.error_handler")
-        else:
-            await self.bot.reload_extension(self.cogs + cog.lower())
-            await ctx.send(f"Reloaded extension `{cog.lower()}`")
+        try:
+            if cog == "errors":
+                await self.bot.unload_extension("utils.error_handler")
+            else:
+                await self.bot.unload_extension(self.cogs + cog.lower())
+                await ctx.send(f"Unloaded extension `{cog.lower()}`")
+        except commands.ExtensionNotLoaded:
+            await ctx.send("The specified extension has not be previously loaded")
 
     @commands.has_permissions(administrator=True)
     @commands.command(name='shutdown')
@@ -60,6 +67,7 @@ class Owner(commands.Cog):
             sys.exit(-1)
         except Exception as e:
             self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
 
     @commands.has_permissions(administrator=True)
     @commands.command(name='shutdown')
@@ -72,24 +80,18 @@ class Owner(commands.Cog):
             sys.exit(1)
         except Exception as e:
             self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
 
     @reload.error
     @load.error
     @unload.error
-    async def cog_handler(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
+    async def cog_handler(self, ctx, error: Exception):
+        if isinstance(error, commands.CommandInvokeError):
             await ctx.send("You are missing a required argument. "
                            "Please specify the extension to reload")
-        elif isinstance(error, commands.ExtensionAlreadyLoaded):
-            await ctx.send("Extension is already loaded!")
-        elif isinstance(error, commands.ExtensionNotFound):
-            await ctx.send("I wasn't able to find the specified extension")
-        elif isinstance(error, commands.ExtensionNotLoaded):
-            await ctx.send("The specified extension is already loaded")
+            self.logger.exception(error)
+            await self.creator.create_error_case(ctx, error)
 
-        elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("I'm not sure if this extension exits. "
-                           "Check you console logs for details")
         else:
             await self.creator.create_error_case(ctx, error)
             self.logger.exception(error)
