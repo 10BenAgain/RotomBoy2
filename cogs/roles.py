@@ -1,13 +1,20 @@
+import json
 import logging
 
 import discord
 from discord.ext import commands
+
+from utils.creator import Cases
 
 
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger('rotom')
+        with open("config.json") as c:
+            config = json.load(c)
+            self.channel_id = config['channels']['serverlog']
+        self.creator = Cases(self.bot, self.channel_id)
 
     @commands.group()
     async def role(self, ctx):
@@ -72,8 +79,20 @@ class Roles(commands.Cog):
     async def role_handler(self, ctx, error):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send("I wasn't able to find that user")
+        if isinstance(error, commands.MissingRequiredArgument):
+            if ctx.command.name == "add":
+                await ctx.send("You are missing a required argument."
+                               "```Example:\n"
+                               "\t[p] role add <role> <user>\n"
+                               "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name))
+            if ctx.command.name == "remove":
+                await ctx.send("You are missing a required argument."
+                               "```Example:\n"
+                               "\t[p] role remove <role> <user>\n"
+                               "\t{}role remove Admin {}``` ".format(self.bot.command_prefix, ctx.author.name))
         else:
             self.logger.error(error)
+            await self.creator.create_error_case(ctx, error)
 
 
 async def setup(bot):
