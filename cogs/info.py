@@ -50,8 +50,7 @@ class Info(commands.Cog):
             msg = await (discord.ext.commands.MessageConverter()
                          .convert(await self.bot.get_context(message), argument=message.content))
         except commands.BadArgument as e:
-            self.logger.error(e)
-            return await message.channel.send("An unexpected error has occurred. Check your console for details")
+            pass
 
         emb = discord.Embed(colour=discord.Colour.orange())
         emb.set_author(name=f"{msg.author.name} said: ", icon_url=msg.author.display_avatar)
