@@ -163,9 +163,13 @@ class Mod(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @commands.command(name="clearwarns")
     async def clear_warns(self, ctx, user: discord.User):
-        for i in self.database.get_all_warn_id(user.id):
-            self.database.remove_warn(i[0])
-        await ctx.send("All warns from user have been removed.")
+        try:
+            for i in self.database.get_all_warn_id(user.id):
+                self.database.remove_warn(i[0])
+            await ctx.send("All warns from user have been removed.")
+        except Exception as error:
+            await self.creator.create_error_case(ctx, error)
+            await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
