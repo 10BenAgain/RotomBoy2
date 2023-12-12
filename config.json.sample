@@ -1,0 +1,18 @@
+{
+  "token": "",
+  "prefix": "",
+  "status": "",
+  "invite": "",
+  "channels": {
+    "modlog": ,
+    "serverlog": ,
+    "welcome": ,
+    "forwarding": 
+  },
+  "database": {
+    "host": "localhost",
+    "user": "",
+    "password": "",
+    "database": ""
+  }
+}
