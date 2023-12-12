@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import sys
 
 from discord.ext import commands
@@ -11,6 +12,13 @@ class Owner(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger('rotom')
         self.cogs = "cogs."
+        self.cog_path = os.path.join(os.getcwd(), "cogs")
+        if os.path.exists(self.cog_path):
+            self.cog_list = []
+            for cog in os.listdir(self.cog_path):
+                if os.path.isfile(os.path.join(self.cog_path, cog)):
+                    self.cog_list.append(cog.replace(".py", "").lower())
+
         with open("config.json") as c:
             config = json.load(c)
             self.channel_id = config['channels']['serverlog']
@@ -18,21 +26,25 @@ class Owner(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @commands.command()
-    async def reload(self, ctx, cog):
+    async def reload(self, ctx, cog: str):
+        if cog.lower() not in self.cog_list:
+            return await ctx.send("The specified extension does not appear in my working directory.")
+
         if cog.lower() == "owner":
             return await ctx.send("Unable to reload owner cog.")
-        try:
-            if cog == "errors":
-                await self.bot.reload_extension("utils.error_handler")
-            else:
-                await self.bot.reload_extension(self.cogs + cog.lower())
-                await ctx.send(f"Reloaded extension `{cog.lower()}`")
-        except commands.ExtensionNotLoaded:
-            await ctx.send("The specified extension is has not been loaded")
+
+        if cog == "errors":
+            await self.bot.reload_extension("utils.error_handler")
+        else:
+            await self.bot.reload_extension(self.cogs + cog.lower())
+            await ctx.send(f"Reloaded extension `{cog.lower()}`")
 
     @commands.has_permissions(administrator=True)
     @commands.command()
-    async def load(self, ctx, cog):
+    async def load(self, ctx, cog: str):
+        if cog.lower() not in self.cog_list:
+            return await ctx.send("The specified extension does not appear in my working directory.")
+
         try:
             if cog == "errors":
                 await self.bot.load_extension("utils.error_handler")
@@ -44,7 +56,10 @@ class Owner(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @commands.command()
-    async def unload(self, ctx, cog):
+    async def unload(self, ctx, cog: str):
+        if cog.lower() not in self.cog_list:
+            return await ctx.send("The specified extension does not appear in my working directory.")
+
         if cog.lower() == "owner":
             return await ctx.send("Unable to unload owner cog.")
         try:
@@ -86,9 +101,10 @@ class Owner(commands.Cog):
     @load.error
     @unload.error
     async def cog_handler(self, ctx, error: Exception):
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("You are missing a required argument. "
                            "Please specify the extension to reload")
+        elif isinstance(error, commands.CommandInvokeError):
             self.logger.exception(error)
             await self.creator.create_error_case(ctx, error)
 
