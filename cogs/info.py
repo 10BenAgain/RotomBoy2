@@ -49,8 +49,8 @@ class Info(commands.Cog):
         try:
             msg = await (discord.ext.commands.MessageConverter()
                          .convert(await self.bot.get_context(message), argument=message.content))
-        except commands.BadArgument as e:
-            pass
+        except commands.BadArgument:
+            return
 
         emb = discord.Embed(colour=discord.Colour.orange())
         emb.set_author(name=f"{msg.author.name} said: ", icon_url=msg.author.display_avatar)
