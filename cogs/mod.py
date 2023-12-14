@@ -126,7 +126,13 @@ class Mod(commands.Cog):
     async def list_warns(self, ctx, user: discord.User):
         if user.bot:
             return await ctx.send("Nope.")
-        warns = self.database.get_all_warns(user.id)
+        try:
+            warns = self.database.get_all_warns(user.id)
+        except Exception as error:
+            self.logger.exception(error)
+            return await ctx.send("I wasn't able to access the database entries. "
+                                  "Check console logs for details")
+
         warn_count = self.database.count_warns(user.id)
         if warn_count != 0:
             emb = discord.Embed(colour=discord.Colour.dark_orange())

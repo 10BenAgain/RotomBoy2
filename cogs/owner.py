@@ -35,10 +35,9 @@ class Owner(commands.Cog):
         try:
             if cog == "errors":
                 await self.bot.reload_extension("utils.error_handler")
-                await ctx.send(f"Reloaded extension `{cog.lower()}`")
             else:
                 await self.bot.reload_extension(self.cogs + cog.lower())
-                await ctx.send(f"Reloaded extension `{cog.lower()}`")
+            await ctx.send(f"Reloaded extension `{cog.lower()}`")
         except commands.ExtensionAlreadyLoaded:
             await ctx.send("The specified extension is already loaded")
         except commands.ExtensionNotLoaded:
@@ -55,7 +54,7 @@ class Owner(commands.Cog):
                 await self.bot.load_extension("utils.error_handler")
             else:
                 await self.bot.load_extension(self.cogs + cog.lower())
-                await ctx.send(f"Loaded extension `{cog.lower()}`")
+            await ctx.send(f"Loaded extension `{cog.lower()}`")
         except commands.ExtensionAlreadyLoaded:
             await ctx.send("The specified extension is already loaded")
 
@@ -72,7 +71,7 @@ class Owner(commands.Cog):
                 await self.bot.unload_extension("utils.error_handler")
             else:
                 await self.bot.unload_extension(self.cogs + cog.lower())
-                await ctx.send(f"Unloaded extension `{cog.lower()}`")
+            await ctx.send(f"Unloaded extension `{cog.lower()}`")
         except commands.ExtensionNotLoaded:
             await ctx.send("The specified extension has not be previously loaded")
 
