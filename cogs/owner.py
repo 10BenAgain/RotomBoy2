@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import subprocess
 import sys
 
 from discord.ext import commands
@@ -98,6 +99,16 @@ class Owner(commands.Cog):
             await ctx.bot.close()
             sys.exit(0)  # on-success
         except Exception as e:
+            self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
+
+    @commands.has_permissions(administrator=True)
+    @commands.command(name='gpull')
+    async def git_pull(self, ctx):
+        try:
+            output = subprocess.run(['git', 'pull'], check=True, shell=True, stdout=subprocess.PIPE)
+            await ctx.send(output)
+        except subprocess.CalledProcessError as e:
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)
 
