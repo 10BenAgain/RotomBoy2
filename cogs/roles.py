@@ -81,9 +81,11 @@ class Roles(commands.Cog):
     @add_role.error
     @del_role.error
     async def role_handler(self, ctx, error):
-        if isinstance(error, commands.MemberNotFound):
+        if isinstance(error, commands.RoleNotFound):
+            await ctx.send("I wasn't able to find that role")
+        elif isinstance(error, commands.MemberNotFound):
             await ctx.send("I wasn't able to find that user")
-        if isinstance(error, commands.MissingRequiredArgument):
+        elif isinstance(error, commands.MissingRequiredArgument):
             if ctx.command.name == "add":
                 await ctx.send("You are missing a required argument."
                                "```Example:\n"

@@ -106,8 +106,8 @@ class Owner(commands.Cog):
     @commands.command(name='gpull')
     async def git_pull(self, ctx):
         try:
-            output = subprocess.run(['git', 'pull'], check=True, shell=True, stdout=subprocess.PIPE)
-            await ctx.send(output)
+            output = subprocess.run(['git', 'status'], check=True, shell=True, capture_output=True)
+            await ctx.send(output.stdout)
         except subprocess.CalledProcessError as e:
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)
