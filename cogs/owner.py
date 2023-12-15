@@ -89,8 +89,8 @@ class Owner(commands.Cog):
             await self.creator.create_error_case(ctx, e)
 
     @commands.has_permissions(administrator=True)
-    @commands.command(name='shutdown')
-    async def shutdown(self, ctx):
+    @commands.command(name='restart')
+    async def restart(self, ctx):
         wave = '\N{WAVING HAND SIGN}'
         await ctx.send("Restarting... {}".format(wave))
         self.logger.info("Bot issued restart command. Exiting")
