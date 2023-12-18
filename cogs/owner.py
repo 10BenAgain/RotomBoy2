@@ -151,6 +151,16 @@ class Owner(commands.Cog):
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)
 
+    @git.command(name="push")
+    async def git_push(self, ctx):
+        try:
+            output = subprocess.run(['git', 'push'], check=True, shell=True, capture_output=True)
+            formatted = output.stdout.decode('utf-8').strip("'")
+            await ctx.send(f"```bash\n{formatted}```")
+        except subprocess.CalledProcessError as e:
+            self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
+
     @reload.error
     @load.error
     @unload.error
