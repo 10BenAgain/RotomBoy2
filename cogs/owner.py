@@ -103,11 +103,50 @@ class Owner(commands.Cog):
             await self.creator.create_error_case(ctx, e)
 
     @commands.has_permissions(administrator=True)
-    @commands.command(name='gpull')
-    async def git_pull(self, ctx):
+    @commands.group()
+    async def git(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send("You are missing a required argument")
+
+    @git.command(name="status")
+    async def git_status(self, ctx):
         try:
             output = subprocess.run(['git', 'status'], check=True, shell=True, capture_output=True)
-            await ctx.send(output.stdout)
+            formatted = output.stdout.decode('utf-8').strip("'")
+            await ctx.send(f"```bash\n{formatted}```")
+        except subprocess.CalledProcessError as e:
+            self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
+
+    @git.command(name="pull")
+    async def git_pull(self, ctx):
+        try:
+            output = subprocess.run(['git', 'pull'], check=True, shell=True, capture_output=True)
+            formatted = output.stdout.decode('utf-8').strip("'")
+            await ctx.send(f"```bash\n{formatted}```")
+        except subprocess.CalledProcessError as e:
+            self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
+
+    @git.command(name="add")
+    async def git_add(self, ctx, arg):
+        try:
+            subprocess.run(['git', 'add', arg], check=True, shell=True, capture_output=True)
+            output = subprocess.run(['git', 'status'], check=True, shell=True, capture_output=True)
+            formatted = output.stdout.decode('utf-8').strip("'")
+            await ctx.send(f"```bash\n{formatted}```")
+        except subprocess.CalledProcessError as e:
+            self.logger.exception(e)
+            await self.creator.create_error_case(ctx, e)
+
+    @git.command(name="commit")
+    async def git_commit(self, ctx, message=None):
+        if message is None:
+            message = f"Committed by {ctx.author.name} via Discord commands"
+        try:
+            output = subprocess.run(['git', 'commit', '-m', message], check=True, shell=True, capture_output=True)
+            formatted = output.stdout.decode('utf-8').strip("'")
+            await ctx.send(f"```bash\n{formatted}```")
         except subprocess.CalledProcessError as e:
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)

@@ -279,7 +279,7 @@ class Mod(commands.Cog):
         if reason is None:
             reason = "No reason was provided."
 
-        message = ("{} **Member**: {} has been banned | **Reason**: `{}`"
+        message = ("{} **User**: {} has been banned | **Reason**: `{}`"
                    .format(Flags.ban.value, user.id, reason))
         try:
             await ctx.guild.fetch_ban(user)

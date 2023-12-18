@@ -4,6 +4,8 @@ import discord
 from datetime import datetime
 from discord.ext import commands
 
+from utils.creator import Cases
+
 
 class Logs(commands.Cog):
     def __init__(self, bot):
@@ -11,6 +13,7 @@ class Logs(commands.Cog):
         with open("config.json") as c:
             config = json.load(c)
             self.server_log_id = config['channels']['serverlog']
+        self.creator = Cases(self.bot, self.server_log_id)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
