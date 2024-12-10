@@ -15,26 +15,32 @@ delete_warn = "DELETE FROM warns WHERE warn_id = {}"
 
 class Database:
     def __init__(self):
-        self.host = "localhost"
         self.logger = logging.getLogger('rotom')
         with open("config.json") as c:
             config = json.load(c)
+            self.host = config['database']['host']
             self.username = config['database']['user']
             self.password = config['database']['password']
             self.database = config['database']['database']
 
+        try:
+            self.cnx = mysql.connector.connect(
+                host=self.host,
+                user=self.username,
+                password=self.password,
+                database=self.database
+            )
+
+            self.cursor = self.cnx.cursor()
+        except Exception as e:
+            self.logger.error(e)
+            raise e
+
     def add_warn(self, user: int, author: int, name: str, reason: str):
         values = (user, author, name, reason, datetime.now())
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(add_warn, values)
-                    db.commit()
+            self.cursor.execute(add_warn, values)
+            self.cnx.commit()
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -42,31 +48,16 @@ class Database:
     def count_warns(self, user: int):
         func = count_warns.format(user)
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(func)
-                    count = cursor.fetchone()[0]
-                    return count
+            self.cursor.execute(func)
+            return self.cursor.fetchone()[0]
         except Exception as e:
             self.logger.exception(e)
             raise
 
     def get_all_ids(self):
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(get_warn_id)
-                    return cursor.fetchall()
+            self.cursor.execute(get_warn_id)
+            return self.cursor.fetchall()
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -74,15 +65,8 @@ class Database:
     def get_all_warns(self, user):
         func = get_all_warns.format(user)
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(func)
-                    return cursor.fetchall()
+            self.cursor.execute(func)
+            return self.cursor.fetchall()
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -90,15 +74,8 @@ class Database:
     def get_all_warn_id(self, user_id: int):
         func = get_all_warn_id.format(user_id)
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(func)
-                    return cursor.fetchall()
+            self.cursor.execute(func)
+            return self.cursor.fetchall()
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -106,15 +83,8 @@ class Database:
     def remove_warn(self, warn_id: int):
         func = delete_warn.format(warn_id)
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(func)
-                    db.commit()
+            self.cursor.execute(func)
+            self.cnx.commit()
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -122,15 +92,8 @@ class Database:
     def check_warn_exist(self, warn_id):
         func = check_warn_exist.format(warn_id)
         try:
-            with mysql.connector.connect(
-                    host=self.host,
-                    user=self.username,
-                    password=self.password,
-                    database=self.database
-            ) as db:
-                with db.cursor() as cursor:
-                    cursor.execute(func)
-                    return cursor.fetchone()
+            self.cursor.execute(func)
+            return self.cursor.fetchone()
         except Exception as e:
             self.logger.exception(e)
             raise
