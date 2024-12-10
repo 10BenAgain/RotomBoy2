@@ -1,8 +1,8 @@
+import os
+import sys
 import json
 import logging
-import os
 import subprocess
-import sys
 
 from discord.ext import commands
 from utils.creator import Cases
@@ -84,7 +84,7 @@ class Owner(commands.Cog):
         self.logger.info("Bot issued shutdown command. Exiting")
         try:
             await ctx.bot.close()
-            sys.exit(1)
+            sys.exit(0) # on-success
         except Exception as e:
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)
@@ -97,7 +97,7 @@ class Owner(commands.Cog):
         self.logger.info("Bot issued restart command. Exiting")
         try:
             await ctx.bot.close()
-            sys.exit(0)  # on-success
+            sys.exit(1)
         except Exception as e:
             self.logger.exception(e)
             await self.creator.create_error_case(ctx, e)

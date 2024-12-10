@@ -1,6 +1,6 @@
 import json
-
 import discord
+
 from discord.ext import commands
 
 
@@ -16,7 +16,7 @@ class Welcome(commands.Cog):
         welcome = self.bot.get_channel(self.welcome_channel)
         emb = discord.Embed(colour=discord.Colour.green())
         emb.title = f"Welcome to {member.guild.name}, {member.name}!"
-        emb.description = "Make sure to read the <#1178078011711561771> and grab a role from <#1179588487763198022>"
+        emb.description = "Make sure to read the <#808182218178166785> !"
         await welcome.send(content=member.mention, embed=emb)
 
 

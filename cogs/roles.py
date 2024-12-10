@@ -1,9 +1,8 @@
 import json
 import logging
-
 import discord
-from discord.ext import commands
 
+from discord.ext import commands
 from utils.creator import Cases
 
 
@@ -19,12 +18,14 @@ class Roles(commands.Cog):
     @commands.group()
     async def role(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send("You are missing a subcommand argument."
-                           "```Example:\n"
-                           "\t[p] role add <role> <user>\n"
-                           "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name)
-                           )
+            await ctx.send(
+                "You are missing a subcommand argument."
+                "```Example:\n"
+                "\t[p] role add <role> <user>\n"
+                "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name)
+            )
 
+    @commands.has_role("Wow!")
     @role.command(name="add")
     async def add_role(self, ctx, role: discord.Role, user: discord.Member = None):
         if user is None:
@@ -45,6 +46,7 @@ class Roles(commands.Cog):
             except discord.HTTPException as e:
                 self.logger.error(e)
 
+    @commands.has_role("Wow!")
     @role.command(name="remove")
     async def del_role(self, ctx, role: discord.Role, user: discord.Member = None):
         if user is None:
@@ -63,6 +65,7 @@ class Roles(commands.Cog):
             except discord.HTTPException as e:
                 self.logger.error(e)
 
+    @commands.has_role("Wow!")
     @role.command(name="info")
     async def info(self, ctx, role: discord.Role = None):
         if role is None:
@@ -85,17 +88,23 @@ class Roles(commands.Cog):
             await ctx.send("I wasn't able to find that role")
         elif isinstance(error, commands.MemberNotFound):
             await ctx.send("I wasn't able to find that user")
+        elif isinstance(error, discord.ext.commands.MissingRole):
+            await ctx.send("You are missing the required role to run this command.")
         elif isinstance(error, commands.MissingRequiredArgument):
             if ctx.command.name == "add":
-                await ctx.send("You are missing a required argument."
-                               "```Example:\n"
-                               "\t[p] role add <role> <user>\n"
-                               "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name))
+                await ctx.send(
+                    "You are missing a required argument."
+                    "```Example:\n"
+                    "\t[p] role add <role> <user>\n"
+                    "\t{}role add Admin {}``` ".format(self.bot.command_prefix, ctx.author.name)
+                )
             if ctx.command.name == "remove":
-                await ctx.send("You are missing a required argument."
-                               "```Example:\n"
-                               "\t[p] role remove <role> <user>\n"
-                               "\t{}role remove Admin {}``` ".format(self.bot.command_prefix, ctx.author.name))
+                await ctx.send(
+                    "You are missing a required argument."
+                    "```Example:\n"
+                    "\t[p] role remove <role> <user>\n"
+                    "\t{}role remove Admin {}``` ".format(self.bot.command_prefix, ctx.author.name)
+                )
         else:
             self.logger.error(error)
             await self.creator.create_error_case(ctx, error)

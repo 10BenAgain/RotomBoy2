@@ -1,10 +1,9 @@
-import asyncio
 import os
-import json
-import logging
 import sys
-
+import json
 import discord
+import asyncio
+import logging
 
 from discord.ext import commands
 from os.path import isfile, join

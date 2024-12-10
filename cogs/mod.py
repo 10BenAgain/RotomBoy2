@@ -1,5 +1,4 @@
 import json
-
 import discord
 import logging
 
@@ -23,7 +22,7 @@ class Mod(commands.Cog):
             self.invite = config['invite']
         self.creator = Cases(self.bot, self.server_log_id)
 
-    async def send_direct(self, user: discord.Member or discord.User, author: discord.Member, case, reason, count=None):
+    async def _send_direct(self, user: discord.Member or discord.User, author: discord.Member, case, reason, count=None):
         dm = discord.Embed(colour=discord.Colour.red())
         if case == "kick":
             action = "kicked from"
@@ -51,6 +50,7 @@ class Mod(commands.Cog):
             return await user.send(embed=dm)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(kick_members=True)
     @commands.command(name='warn')
     async def warn(self, ctx, user: discord.Member, *, reason=None):
@@ -63,14 +63,18 @@ class Mod(commands.Cog):
         if reason is None:
             reason = "No reason was provided."
         try:
-            self.database.add_warn(user.id,
-                                   ctx.author.id,
-                                   ctx.author.name,
-                                   reason)
+            self.database.add_warn(
+                user.id,
+                ctx.author.id,
+                ctx.author.name,
+                reason
+            )
         except Exception as error:
             self.logger.exception(error)
-            return await ctx.send("I wasn't able to add the database entry for this warn. "
-                                  "Check console logs for details")
+            return await ctx.send(
+                "I wasn't able to add the database entry for this warn. "
+                "Check console logs for details"
+            )
 
         count = self.database.count_warns(user.id)
 
@@ -79,7 +83,7 @@ class Mod(commands.Cog):
                        .format(Flags.warn.value, user.mention, count, reason))
             if count > 3:
                 try:
-                    await self.send_direct(
+                    await self._send_direct(
                         user,
                         ctx.author,
                         "ban",
@@ -102,7 +106,7 @@ class Mod(commands.Cog):
                 await ctx.send(content=message)
                 await self.creator.create_modlog_case(user, "warn", ctx.author, reason, count)
                 try:
-                    await self.send_direct(user, ctx.author, "warn", reason, count)
+                    await self._send_direct(user, ctx.author, "warn", reason, count)
                 except discord.Forbidden as error:
                     self.logger.exception(error)
                     await ctx.send("The user has been warned but I was unable to send them a direct message.")
@@ -110,7 +114,7 @@ class Mod(commands.Cog):
                 await ctx.send(content=message)
                 await self.creator.create_modlog_case(user, "warn", ctx.author, reason, count)
                 try:
-                    await self.send_direct(user, ctx.author, "warn", reason, count)
+                    await self._send_direct(user, ctx.author, "warn", reason, count)
                 except discord.Forbidden as error:
                     self.logger.exception(error)
                     await ctx.send("The user has been warned but I was unable to send them a direct message.")
@@ -121,6 +125,7 @@ class Mod(commands.Cog):
             await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(kick_members=True)
     @commands.command(name='listwarns')
     async def list_warns(self, ctx, user: discord.User):
@@ -150,6 +155,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=emb)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(ban_members=True)
     @commands.command(name='delwarn')
     async def delete_warn(self, ctx, warn_id: int):
@@ -166,6 +172,7 @@ class Mod(commands.Cog):
             await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(ban_members=True)
     @commands.command(name="clearwarns")
     async def clear_warns(self, ctx, user: discord.User):
@@ -178,6 +185,7 @@ class Mod(commands.Cog):
             await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(kick_members=True)
     @commands.command(name='kick')
     async def kick(self, ctx, user: discord.Member, *, reason=None):
@@ -190,7 +198,7 @@ class Mod(commands.Cog):
 
         try:
             try:
-                await self.send_direct(user, ctx.author, "kick", reason)
+                await self._send_direct(user, ctx.author, "kick", reason)
             except discord.Forbidden as e:
                 self.logger.error(e)
                 await ctx.send("I wasn't able to deliver a message to the user.")
@@ -205,6 +213,7 @@ class Mod(commands.Cog):
             await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(kick_members=True)
     @commands.command(name="kickwarn")
     async def kick_warn(self, ctx, user: discord.Member, *, reason=None):
@@ -215,10 +224,12 @@ class Mod(commands.Cog):
         if reason is None:
             reason = "No reason was provided."
         try:
-            self.database.add_warn(user.id,
-                                   ctx.author.id,
-                                   ctx.author.name,
-                                   reason)
+            self.database.add_warn(
+                user.id,
+                ctx.author.id,
+                ctx.author.name,
+                reason
+            )
         except Exception as e:
             self.logger.exception(e)
             return await ctx.send("I wasn't able to add the database entry for this warn. "
@@ -230,7 +241,7 @@ class Mod(commands.Cog):
                        .format(Flags.kick.value, user.mention, count, reason))
             if count > 3:
                 try:
-                    await self.send_direct(user, ctx.author, "ban", reason)
+                    await self._send_direct(user, ctx.author, "ban", reason)
                 except discord.Forbidden as e:
                     self.logger.error(e)
                     await ctx.send("I wasn't able to deliver a message to the user.")
@@ -244,7 +255,7 @@ class Mod(commands.Cog):
 
             elif count == 3:
                 try:
-                    await self.send_direct(user, ctx.author, "kick", reason, count)
+                    await self._send_direct(user, ctx.author, "kick", reason, count)
                 except discord.Forbidden as e:
                     self.logger.error(e)
                     await ctx.send("I wasn't able to deliver a message to the user.")
@@ -256,7 +267,7 @@ class Mod(commands.Cog):
 
             else:
                 try:
-                    await self.send_direct(user, ctx.author, "kick", reason, count)
+                    await self._send_direct(user, ctx.author, "kick", reason, count)
                 except discord.Forbidden as e:
                     self.logger.error(e)
                     await ctx.send("I wasn't able to deliver a message to the user.")
@@ -269,6 +280,7 @@ class Mod(commands.Cog):
             await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(ban_members=True)
     @commands.command(name="ban")
     async def user_ban(self, ctx, user: discord.User, *, reason=None):
@@ -289,7 +301,7 @@ class Mod(commands.Cog):
 
             try:
                 try:
-                    await self.send_direct(user, ctx.author, "ban", reason)
+                    await self._send_direct(user, ctx.author, "ban", reason)
                 except discord.Forbidden as e:
                     self.logger.error(e)
                     await ctx.send("I wasn't able to deliver a message to the user.")
@@ -306,6 +318,7 @@ class Mod(commands.Cog):
                 await ctx.send(GENERIC_PROCESS_ERROR)
 
     @commands.guild_only()
+    @commands.has_role("Wow!")
     @commands.has_permissions(ban_members=True)
     @commands.command(name="unban")
     async def un_ban(self, ctx, user: discord.User, *, reason=None):
@@ -325,23 +338,33 @@ class Mod(commands.Cog):
     async def mod_handler(self, ctx, error):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send("I wasn't able to find that user")
+        elif isinstance(error, discord.ext.commands.MissingRole):
+            await ctx.send("You are missing the required role to run this command.")
         elif isinstance(error, commands.MissingRequiredArgument):
             if ctx.command.name == "warn":
-                return await ctx.send(f"You are missing a required argument.\n"
-                                      f"```Example:\n\t[p] warn <member> (reason=None)\n"
-                                      f"\t{self.bot.command_prefix}warn {ctx.author.id} Breaking the rules```")
+                return await ctx.send(
+                    f"You are missing a required argument.\n"
+                    f"```Example:\n\t[p] warn <member> (reason=None)\n"
+                    f"\t{self.bot.command_prefix}warn {ctx.author.id} Breaking the rules```"
+                )
             if ctx.command.name == "kickwarn":
-                return await ctx.send(f"You are missing a required argument.\n"
-                                      f"```Example:\n\t[p] kickwarn <member> (reason=None)\n"
-                                      f"\t{self.bot.command_prefix}kickwarn {ctx.author.id} Breaking the rules```")
+                return await ctx.send(
+                    f"You are missing a required argument.\n"
+                    f"```Example:\n\t[p] kickwarn <member> (reason=None)\n"
+                    f"\t{self.bot.command_prefix}kickwarn {ctx.author.id} Breaking the rules```"
+                )
             if ctx.command.name == "ban":
-                return await ctx.send(f"You are missing a required argument.\n"
-                                      f"```Example:\n\t[p] ban <member> (reason=None)\n"
-                                      f"\t{self.bot.command_prefix}ban {ctx.author.id} Breaking the rules```")
+                return await ctx.send(
+                    f"You are missing a required argument.\n"
+                    f"```Example:\n\t[p] ban <member> (reason=None)\n"
+                    f"\t{self.bot.command_prefix}ban {ctx.author.id} Breaking the rules```"
+                )
             if ctx.command.name == "unban":
-                return await ctx.send(f"You are missing a required argument.\n"
-                                      f"```Example:\n\t[p] unban <member> (reason=None)\n"
-                                      f"\t{self.bot.command_prefix}unban {ctx.author.id} A miracle has occurred```")
+                return await ctx.send(
+                    f"You are missing a required argument.\n"
+                    f"```Example:\n\t[p] unban <member> (reason=None)\n"
+                    f"\t{self.bot.command_prefix}unban {ctx.author.id} A miracle has occurred```"
+                )
         else:
             await self.creator.create_error_case(ctx, error)
 
@@ -351,6 +374,8 @@ class Mod(commands.Cog):
     async def warn_handler(self, ctx, error):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send("I wasn't able to find that user")
+        elif isinstance(error, discord.ext.commands.MissingRole):
+            await ctx.send("You are missing the required role to run this command.")
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(MISSING_USER_ARGUMENT)
         else:

@@ -1,5 +1,5 @@
-import discord
 import json
+import discord
 
 from datetime import datetime
 from discord.ext import commands
@@ -23,8 +23,7 @@ class Forwarding(commands.Cog):
                            icon_url=message.author.display_avatar)
             emb.description = message.content
             if len(message.attachments) == 1:
-                for i in message.attachments:
-                    emb.set_image(url=i.url)
+                emb.set_image(url=i.url)
             elif len(message.attachments) > 1:
                 for i in message.attachments:
                     emb.description += f"\n> {i.url}\n"
