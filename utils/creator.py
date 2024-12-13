@@ -1,6 +1,6 @@
 import logging
-from datetime import datetime
 from enum import Enum
+from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -31,9 +31,11 @@ class Cases:
 
     async def create_error_case(self, ctx: commands.Context, error: Exception):
         emb = discord.Embed(colour=discord.Colour.red())
-        emb.set_author(name="An unhandled error has occurred",
-                       url=ctx.message.jump_url,
-                       icon_url=ctx.author.display_avatar)
+        emb.set_author(
+            name="An unhandled error has occurred",
+            url=ctx.message.jump_url,
+            icon_url=ctx.author.display_avatar
+        )
         emb.description = f"```{error}```"
         emb.add_field(name="`Type`", value=f"> {type(error).__name__}")
         emb.add_field(name="`Author`", value=f"> {ctx.author.mention}")
@@ -59,8 +61,10 @@ class Cases:
         else:
             emb.description = f"> How did we get here?"
 
-        emb.set_author(name="{} | ({})".format(user.name, user.id),
-                       icon_url=user.display_avatar)
+        emb.set_author(
+            name="{} | ({})".format(user.name, user.id),
+            icon_url=user.display_avatar
+        )
         emb.timestamp = datetime.now()
         emb.add_field(name="**Reason**", value=f"> {reason}")
         emb.add_field(name="**Moderator**", value=f"> {author.name}\n> {author.id}")

@@ -20,28 +20,39 @@ class Logs(commands.Cog):
         emb = discord.Embed(colour=discord.Colour.green())
         emb.timestamp = member.joined_at
         emb.set_thumbnail(url=member.display_avatar)
-        emb.set_author(name="{} {} has joined ({})".format("\N{SQUARED NEW}", member.name, member.id),
-                       icon_url=member.display_avatar)
-
-        emb.add_field(name="**Member**",
-                      value=member.mention,
-                      inline=True)
-        emb.add_field(name="**Member ID**",
-                      value=f"`{member.id}`",
-                      inline=True)
-        emb.add_field(name="**Total Users**",
-                      value=member.guild.member_count,
-                      inline=True)
-        emb.add_field(name="**Account Created on:**",
-                      value=member.created_at.strftime("%m/%d/%Y"),
-                      inline=True)
+        emb.set_author(
+            name="{} {} has joined ({})".format("\N{SQUARED NEW}", member.name, member.id),
+            icon_url=member.display_avatar
+        )
+        emb.add_field(
+            name="**Member**",
+            value=member.mention,
+            inline=True
+        )
+        emb.add_field(
+            name="**Member ID**",
+            value=f"`{member.id}`",
+            inline=True
+        )
+        emb.add_field(
+            name="**Total Users**",
+            value=member.guild.member_count,
+            inline=True
+        )
+        emb.add_field(
+            name="**Account Created on:**",
+            value=member.created_at.strftime("%m/%d/%Y"),
+            inline=True
+        )
         await logging_channel.send(embed=emb)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         logging_channel = self.bot.get_channel(self.server_log_id)
-        emb = discord.Embed(title="{} {} has left the guild".format("\N{DOOR}", member.name),
-                            color=discord.Colour.red())
+        emb = discord.Embed(
+            title="{} {} has left the guild".format("\N{DOOR}", member.name),
+            color=discord.Colour.red()
+        )
         emb.timestamp = datetime.now()
         emb.set_thumbnail(url=member.display_avatar)
         emb.add_field(name="**Member**", value=member.mention, inline=True)
@@ -64,7 +75,8 @@ class Logs(commands.Cog):
 
             emb.set_author(
                 name="{} {} ({}) | Deleted message".format("\N{CROSS MARK}", user.name, user.id),
-                icon_url=message.author.display_avatar)
+                icon_url=message.author.display_avatar
+            )
 
             emb.add_field(name="**Channel**", value=message.channel.mention, inline=True)
             emb.add_field(name="**Member**", value=message.author.mention, inline=True)
@@ -98,10 +110,11 @@ class Logs(commands.Cog):
 
                 emb.set_author(
                     name="{}{}  ({}) | Message edited"
-                    .format("\N{SPEECH BALLOON}",
-                            origin.author.name,
-                            origin.author.id
-                            ),
+                    .format(
+                        "\N{SPEECH BALLOON}",
+                        origin.author.name,
+                        origin.author.id
+                    ),
                     icon_url=origin.author.display_avatar)
 
                 emb.add_field(name="**Channel**", value=origin.jump_url, inline=True)

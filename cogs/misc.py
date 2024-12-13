@@ -13,13 +13,14 @@ class Misc(commands.Cog):
     @commands.command(name='explain', help='I need more context from you')
     async def explain(self, ctx):
         emb = discord.Embed(title="How to Properly Explain a Problem", colour=discord.Colour.red())
-        emb.description = ("If you are having an issue you need to FULLY EXPLAIN the following things.\n\n"
-                           "> 1. Exactly what is supposed to happen but is not.\n"
-                           "> 2. What is happening instead.\n"
-                           "> 3. How to reproduce the error.\n\n"
-                           "Please make sure you have thoroughly read the Guides and FAQs before asking for further "
-                           "support"
-                           )
+        emb.description = (
+            "If you are having an issue you need to FULLY EXPLAIN the following things.\n\n"
+            "> 1. Exactly what is supposed to happen but is not.\n"
+            "> 2. What is happening instead.\n"
+            "> 3. How to reproduce the error.\n\n"
+            "Please make sure you have thoroughly read the Guides and FAQs before asking for further "
+            "support"
+        )
         await ctx.send(embed=emb)
 
     @commands.command(name='read', help='Reading is hard')
@@ -57,9 +58,11 @@ class Misc(commands.Cog):
 
     @commands.command(name='surprise', help='What is zacian.net?')
     async def try_it(self, ctx):
-        await ctx.send('Yes, the Zacian.net Pokémon you received in surprise trade is legal. You will not get banned '
-                       'or in trouble for having it. Keep it or release it, but do keep the Master Ball. It\'s a way '
-                       'to promote this server.')
+        await ctx.send(
+            'Yes, the Zacian.net Pokémon you received in surprise trade is legal. You will not get banned '
+            'or in trouble for having it. Keep it or release it, but do keep the Master Ball. It\'s a way '
+            'to promote this server.'
+        )
 
     @commands.group()
     async def sql(self, ctx):
@@ -68,8 +71,10 @@ class Misc(commands.Cog):
 
     @sql.command(name="warns")
     async def warns(self, ctx):
-        await ctx.send("```sql\nCREATE table warns(\nwarn_id INT PRIMARY KEY AUTO_INCREMENT,\nuser_id BIGINT,"
-                       "\nauthor_id BIGINT,\nauthor_name VARCHAR(25),\nreason VARCHAR(2000),\ndate_time datetime\n);```")
+        await ctx.send(
+            "```sql\nCREATE table warns(\nwarn_id INT PRIMARY KEY AUTO_INCREMENT,\nuser_id BIGINT,"
+            "\nauthor_id BIGINT,\nauthor_name VARCHAR(25),\nreason VARCHAR(2000),\ndate_time datetime\n);```"
+        )
 
 
 async def setup(bot):

@@ -232,8 +232,10 @@ class Mod(commands.Cog):
             )
         except Exception as e:
             self.logger.exception(e)
-            return await ctx.send("I wasn't able to add the database entry for this warn. "
-                                  "Check console logs for details")
+            return await ctx.send(
+                "I wasn't able to add the database entry for this warn. "
+                "Check console logs for details"
+            )
 
         count = self.database.count_warns(user.id)
         try:

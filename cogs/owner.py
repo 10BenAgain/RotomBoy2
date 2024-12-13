@@ -166,8 +166,10 @@ class Owner(commands.Cog):
     @unload.error
     async def cog_handler(self, ctx, error: Exception):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("You are missing a required argument. "
-                           "Please specify the extension to reload")
+            await ctx.send(
+                "You are missing a required argument. "
+                "Please specify the extension to reload"
+            )
         elif isinstance(error, commands.CommandInvokeError):
             self.logger.exception(error)
             await self.creator.create_error_case(ctx, error)
