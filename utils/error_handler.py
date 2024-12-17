@@ -13,7 +13,7 @@ class ErrorHandler(commands.Cog):
         self.warn_icon = "\U0001F6AB"
         with open('config.json') as c:
             config = json.load(c)
-            self.server_log_id = config['channels']['serverlog']
+            self.server_log_id = config['serverlog']
         self.case_creator = Cases(bot, self.server_log_id)
 
     @commands.Cog.listener()

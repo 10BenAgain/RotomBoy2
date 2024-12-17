@@ -1,18 +1,10 @@
 {
   "token": "",
-  "prefix": "",
-  "status": "",
-  "invite": "",
-  "channels": {
-    "modlog": ,
-    "serverlog": ,
-    "welcome": ,
-    "forwarding": 
-  },
-  "database": {
-    "host": "localhost",
-    "user": "",
-    "password": "",
-    "database": ""
-  }
+  "prefix": "?",
+  "status": "Testing",
+  "serverlog": ,
+  "port": "COM4",
+  "baud_rate": 9600,
+  "bytesize": 8,
+  "role":
 }

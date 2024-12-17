@@ -22,7 +22,7 @@ class Owner(commands.Cog):
 
         with open("config.json") as c:
             config = json.load(c)
-            self.channel_id = config['channels']['serverlog']
+            self.channel_id = config['serverlog']
         self.creator = Cases(self.bot, self.channel_id)
 
     @commands.has_permissions(administrator=True)
@@ -36,7 +36,7 @@ class Owner(commands.Cog):
         try:
             if cog == "errors":
                 await self.bot.reload_extension("utils.error_handler")
-            else:
+            elif cog == "controller":
                 await self.bot.reload_extension(self.cogs + cog.lower())
             await ctx.send(f"Reloaded extension `{cog.lower()}`")
         except commands.ExtensionAlreadyLoaded:
