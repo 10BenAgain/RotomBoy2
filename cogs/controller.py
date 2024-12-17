@@ -1,11 +1,11 @@
 import json
+import logging
+import serial
 
 import discord.ext.commands
-import serial
-import logging
-
 from discord.ext import commands
-from utils.creator import Cases, GENERIC_PROCESS_ERROR, MISSING_USER_ARGUMENT, Flags
+
+from utils.creator import Cases, MISSING_USER_ARGUMENT
 
 dev = serial.Serial()
 
@@ -110,6 +110,40 @@ class Controller(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @commands.group()
+    async def console(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send("You are missing a required argument")
+
+    @console.command()
+    async def reboot(self, ctx):
+        ins = [4, 0, 0]
+
+        try:
+            for i in ins:
+                step = f"{i}+"
+                dev.write(step.encode(encoding='ascii'))
+            dev.write("?".encode(encoding='ascii'))
+            dev.flush()
+            await ctx.send(f"Console reboot initiated")
+        except serial.SerialException as e:
+            raise e
+
+    @console.command()
+    async def reset(self, ctx):
+        ins = [3, 0, 0]
+
+        try:
+            for i in ins:
+                step = f"{i}+"
+                dev.write(step.encode(encoding='ascii'))
+            dev.write("?".encode(encoding='ascii'))
+            dev.flush()
+            await ctx.send(f"Soft resetting console")
+        except serial.SerialException as e:
+            raise e
+
+    @commands.has_permissions(administrator=True)
+    @commands.group()
     async def dev(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send("You are missing a required argument")
@@ -144,6 +178,8 @@ class Controller(commands.Cog):
 
     @press.error
     @hold.error
+    @reboot.error
+    @reset.error
     async def warn_handler(self, ctx, error):
         if isinstance(error, discord.ext.commands.MissingRole):
             await ctx.send("You are missing the required role to run this command.")
