@@ -9,7 +9,7 @@ from discord.ext import commands
 from os.path import isfile, join
 
 
-def init_logs():
+def init_logs() -> logging.Logger:
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
@@ -18,34 +18,33 @@ def init_logs():
     return logging.getLogger('rotom')
 
 
-if __name__ == '__main__':
-    logger = init_logs()
-    logger.info("Starting main bot loop")
+def init_bot(logger) -> commands.Bot | None:
+    intents = discord.Intents.all()
+    intents.members = True
     try:
         with open("config.json") as c:
             config = json.load(c)
-            intents = discord.Intents.all()
-            intents.members = True
-            bot = commands.Bot(
+
+            return commands.Bot(
                 command_prefix=config['prefix'],
                 description="Rotom",
-                intents=intents
+                intents=intents,
+                token=config['token']
             )
     except FileNotFoundError:
         logger.critical("No config file found. Please makes sure 'config.json' is in your active directory")
         sys.exit(-1)
 
 
-@bot.event
-async def on_ready():
-    login = f"Successfully logged in as {bot.user}"
-    logger.info(login)
-    await bot.change_presence(activity=discord.Game(name=config['status']))
+def list_cogs() -> list[str]:
+    return ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]
 
 
-async def main():
+async def main() -> None:
+    logger = init_logs()
+    bot = init_bot(logger)
     async with bot:
-        for cog in ["cogs." + f.replace('.py', '') for f in os.listdir('cogs') if isfile(join('cogs', f))]:
+        for cog in list_cogs():
             try:
                 await bot.load_extension(cog)
                 logger.info(f"Cog {cog[5:]} was successfully loaded!")
@@ -57,7 +56,15 @@ async def main():
             logger.info("Error handler loaded")
         except Exception as e:
             logger.exception("Unable to load error handler\n{}".format(e))
+
+        try:
+            with open("config.json") as c:
+                config = json.load(c)
+        except Exception as e:
+            logger.exception("Unable to read bot token!\n{}".format(e))
+
         await bot.start(config['token'])
 
 
-asyncio.run(main())
+if __name__ == '__main__':
+    asyncio.run(main())

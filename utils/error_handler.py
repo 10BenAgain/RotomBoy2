@@ -28,10 +28,11 @@ class ErrorHandler(commands.Cog):
         elif isinstance(error, discord.ext.commands.BotMissingPermissions):
             await ctx.send(f"{self.warn_icon} I do not have the required permissions to do this.")
         elif isinstance(error, discord.ext.commands.CommandInvokeError):
-            await ctx.send("An error has occurred while invoking this command. "
-                           "Check your console logs for more details")
+            await ctx.send(
+                "An error has occurred while invoking this command. "
+                "Check your console logs for more details"
+            )
             self.logger.error(error)
-
             try:
                 await self.case_creator.create_error_case(ctx, error)
             except discord.HTTPException:

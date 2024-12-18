@@ -1,8 +1,8 @@
+import discord
 import logging
+
 from enum import Enum
 from datetime import datetime
-
-import discord
 from discord.ext import commands
 
 GENERIC_PROCESS_ERROR = (
